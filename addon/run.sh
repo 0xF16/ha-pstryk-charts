@@ -4,26 +4,32 @@ CONFIG_PATH=/data/options.json
 
 HA_URL=$(jq --raw-output '.ha_url' $CONFIG_PATH)
 HA_TOKEN=$(jq --raw-output '.ha_token' $CONFIG_PATH)
-INTERVAL=$(jq --raw-output '.update_interval' $CONFIG_PATH)
 CHEAP=$(jq --raw-output '.cheap_threshold' $CONFIG_PATH)
 EXPENSIVE=$(jq --raw-output '.expensive_threshold' $CONFIG_PATH)
+REFRESH_MIN=$(jq --raw-output '.refresh_minute' $CONFIG_PATH)
 
 # Create a temporary config.json for the python script
 echo "{\"HA_URL\": \"$HA_URL\", \"HA_TOKEN\": \"$HA_TOKEN\", \"CHEAP_THRESHOLD\": $CHEAP, \"EXPENSIVE_THRESHOLD\": $EXPENSIVE}" > /app/config.json
 
+echo "Add-on started. Will refresh every hour at minute $REFRESH_MIN."
+
 while true; do
-    echo "Generating dashboard..."
-    cd /app && python3 /app/pstryk_chart.py
-    
-    # Publicly serve as JPG (accessible via http://ha-ip:8123/local/pstryk_charts/dashboard.jpg)
-    mkdir -p /config/www/pstryk_charts
-    cp /app/pstryk_dashboard.jpg /config/www/pstryk_charts/dashboard.jpg
-    cp /app/pstryk_dashboard.pdf /config/www/pstryk_charts/dashboard.pdf
-    
-    # Also keep in share for backup
-    mkdir -p /share/pstryk_charts
-    cp /app/pstryk_dashboard.jpg /share/pstryk_charts/
-    
-    echo "Dashboard updated. Sleeping for $INTERVAL seconds..."
-    sleep "$INTERVAL"
+    CURRENT_MIN=$(date +%-M)
+    if [ "$CURRENT_MIN" -eq "$REFRESH_MIN" ]; then
+        echo "Target minute reached ($REFRESH_MIN). Generating dashboard..."
+        cd /app && python3 /app/pstryk_chart.py
+        
+        # Publicly serve as JPG
+        mkdir -p /config/www/pstryk_charts
+        cp /app/pstryk_dashboard.jpg /config/www/pstryk_charts/dashboard.jpg
+        cp /app/pstryk_dashboard.pdf /config/www/pstryk_charts/dashboard.pdf
+        
+        # Backup to share
+        mkdir -p /share/pstryk_charts
+        cp /app/pstryk_dashboard.jpg /share/pstryk_charts/
+        
+        echo "Dashboard updated. Sleeping for 70s to move to next minute..."
+        sleep 70
+    fi
+    sleep 20
 done

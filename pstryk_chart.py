@@ -10,15 +10,15 @@ CONFIG_FILE = 'config.json'
 DEFAULT_HA_URL = "http://homeassistant.local:8123"
 DEFAULT_HA_TOKEN = ""
 
-# Colors optimized for Color E-ink (High Contrast, Flat)
+# Colors optimized for Light Theme / Color E-ink (High Contrast, Flat)
 COLORS = {
-    'bg': '#000000',
-    'card_bg': '#000000',
-    'text': '#FFFFFF',
-    'cheap': '#00FF00',      # Bright Green
-    'expensive': '#FF0000',  # Bright Red
-    'normal': '#00AAFF',     # Bright Blue
-    'grid': '#333333'
+    'bg': '#FFFFFF',
+    'card_bg': '#FFFFFF',
+    'text': '#000000',
+    'cheap': '#2ECC71',      # Stronger Green
+    'expensive': '#E74C3C',  # Stronger Red
+    'normal': '#3498DB',     # Stronger Blue
+    'grid': '#DDDDDD'
 }
 
 def load_config():
@@ -66,8 +66,13 @@ def render_axis(ax, prices, title, thresholds, is_today=True):
     bars = ax.bar(labels, values, color=colors, edgecolor='none', width=0.8, zorder=3)
     
     # Title
-    ax.text(0.02, 0.95, title, transform=ax.transAxes, color='white', 
+    ax.text(0.02, 0.95, title, transform=ax.transAxes, color=COLORS['text'], 
             fontsize=12, fontweight='bold', va='top')
+
+    # Price labels above bars
+    for bar, val in zip(bars, values):
+        ax.text(bar.get_x() + bar.get_width()/2, val, f"{val:.2f}", 
+                ha='center', va='bottom', fontsize=7, color=COLORS['text'], fontweight='bold')
 
     # X-axis ticks (Vertical)
     ax.tick_params(axis='x', colors=COLORS['text'], labelsize=8, rotation=90)
@@ -77,10 +82,12 @@ def render_axis(ax, prices, title, thresholds, is_today=True):
     for spine in ['top', 'right']:
         ax.spines[spine].set_visible(False)
     for spine in ['left', 'bottom']:
-        ax.spines[spine].set_color(COLORS['grid'])
+        ax.spines[spine].set_color('#000000')
+        ax.spines[spine].set_linewidth(1.5)
 
-    # Grid
-    ax.yaxis.grid(True, linestyle=':', color=COLORS['grid'], alpha=0.5, zorder=0)
+    # Grid (Horizontal lines for readability)
+    ax.yaxis.grid(True, linestyle='-', color=COLORS['grid'], alpha=0.8, zorder=0, linewidth=0.5)
+    ax.set_axisbelow(True) # Ensure grid is behind bars
 
     # Current hour highlight
     if is_today:
@@ -89,7 +96,7 @@ def render_axis(ax, prices, title, thresholds, is_today=True):
         if current_hour_str in labels:
             idx = labels.index(current_hour_str)
             rect = patches.Rectangle((idx - 0.4, 0), 0.8, max(values) * 1.1, 
-                                     linewidth=1, edgecolor='white', facecolor='none', zorder=4)
+                                     linewidth=2, edgecolor='black', facecolor='#000000', alpha=0.1, zorder=4)
             ax.add_patch(rect)
 
 def create_dashboard(today_prices, tomorrow_prices, thresholds):
@@ -107,9 +114,9 @@ def create_dashboard(today_prices, tomorrow_prices, thresholds):
         ax2.text(0.5, 0.5, "BRAK DANYCH NA JUTRO", color='gray', ha='center', va='center', transform=ax2.transAxes)
         ax2.axis('off')
 
-    # Last Updated
-    plt.text(0.98, 0.02, f"Aktualizacja: {datetime.now().strftime('%Y-%m-%d %H:%M')}", 
-             color='gray', fontsize=7, ha='right', va='bottom', transform=fig.transFigure)
+    # Last Updated (More visible footer)
+    plt.text(0.98, 0.03, f"Aktualizacja: {datetime.now().strftime('%Y-%m-%d %H:%M')}", 
+             color='#555555', fontsize=10, ha='right', va='bottom', transform=fig.transFigure, fontweight='bold')
 
     # Save
     plt.savefig("pstryk_dashboard.jpg", facecolor=COLORS['bg'])
@@ -120,10 +127,13 @@ def create_dashboard(today_prices, tomorrow_prices, thresholds):
 def main():
     config = load_config()
     
-    # Thresholds from config
+    # Thresholds from config with defaults
+    cheap_val = config.get('CHEAP_THRESHOLD')
+    exp_val = config.get('EXPENSIVE_THRESHOLD')
+    
     thresholds = {
-        'cheap': config.get('CHEAP_THRESHOLD'),
-        'expensive': config.get('EXPENSIVE_THRESHOLD')
+        'cheap': float(cheap_val) if cheap_val is not None else 0.4,
+        'expensive': float(exp_val) if exp_val is not None else 1.2
     }
 
     # Fetch Data
@@ -135,8 +145,6 @@ def main():
     else:
         print("Using mock data.")
         prices_today, prices_tomorrow, _, _ = get_mock_data()
-        if thresholds['cheap'] is None: thresholds['cheap'] = 0.4
-        if thresholds['expensive'] is None: thresholds['expensive'] = 1.2
 
     create_dashboard(prices_today, prices_tomorrow, thresholds)
 

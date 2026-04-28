@@ -17,12 +17,14 @@ options:
   update_interval: 3600
   cheap_threshold: 0.4
   expensive_threshold: 1.2
+  refresh_minute: 5
 schema:
   ha_url: str
   ha_token: str?
   update_interval: int
   cheap_threshold: float
   expensive_threshold: float
+  refresh_minute: int
 map:
   - config:rw
   - share:rw
