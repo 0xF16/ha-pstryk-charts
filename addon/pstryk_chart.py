@@ -18,8 +18,13 @@ COLORS = {
     'cheap': '#2ECC71',      # Stronger Green
     'expensive': '#E74C3C',  # Stronger Red
     'normal': '#3498DB',     # Stronger Blue
-    'grid': '#DDDDDD'
+    'grid': '#CCCCCC'        # Slightly darker grid
 }
+
+# eInk Friendly Font Settings
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = ['Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', 'sans-serif']
+plt.rcParams['font.weight'] = 'bold'
 
 def load_config():
     if os.path.exists(CONFIG_FILE):
@@ -63,20 +68,26 @@ def render_axis(ax, prices, title, thresholds, is_today=True):
             colors.append(COLORS['normal'])
 
     ax.set_facecolor(COLORS['card_bg'])
-    bars = ax.bar(labels, values, color=colors, edgecolor='none', width=0.8, zorder=3)
+    # Slightly wider bars, preserved gap
+    bar_width = 0.85
+    bars = ax.bar(labels, values, color=colors, edgecolor='none', width=bar_width, zorder=3)
     
+    # Remove horizontal margins so bars fill the whole chart width (touch the edges)
+    ax.set_xlim(-bar_width/2, (len(labels)-1) + bar_width/2)
+    ax.margins(x=0)
+
     # Title
-    ax.text(0.02, 0.95, title, transform=ax.transAxes, color=COLORS['text'], 
-            fontsize=12, fontweight='bold', va='top')
+    ax.text(0.01, 0.95, title, transform=ax.transAxes, color=COLORS['text'], 
+            fontsize=14, fontweight='bold', va='top')
 
-    # Price labels above bars
+    # Price labels above bars (Slightly larger for eInk)
     for bar, val in zip(bars, values):
-        ax.text(bar.get_x() + bar.get_width()/2, val, f"{val:.2f}", 
-                ha='center', va='bottom', fontsize=7, color=COLORS['text'], fontweight='bold')
+        ax.text(bar.get_x() + bar.get_width()/2, val + 0.01, f"{val:.2f}", 
+                ha='center', va='bottom', fontsize=8, color=COLORS['text'], fontweight='bold')
 
-    # X-axis ticks (Vertical)
-    ax.tick_params(axis='x', colors=COLORS['text'], labelsize=8, rotation=90)
-    ax.tick_params(axis='y', colors=COLORS['text'], labelsize=8)
+    # X-axis ticks (Vertical, slightly larger)
+    ax.tick_params(axis='x', colors=COLORS['text'], labelsize=10, rotation=90, width=1.5)
+    ax.tick_params(axis='y', colors=COLORS['text'], labelsize=10, width=1.5)
 
     # Clean up spines
     for spine in ['top', 'right']:
@@ -90,20 +101,22 @@ def render_axis(ax, prices, title, thresholds, is_today=True):
     ax.set_axisbelow(True) # Ensure grid is behind bars
 
     # Current hour highlight
-    if is_today:
-        now = datetime.now()
-        current_hour_str = now.strftime('%H')
-        if current_hour_str in labels:
-            idx = labels.index(current_hour_str)
-            rect = patches.Rectangle((idx - 0.4, 0), 0.8, max(values) * 1.1, 
-                                     linewidth=2, edgecolor='black', facecolor='#000000', alpha=0.1, zorder=4)
-            ax.add_patch(rect)
+    # if is_today:
+    #     now = datetime.now()
+    #     current_hour_str = now.strftime('%H')
+    #     if current_hour_str in labels:
+    #         idx = labels.index(current_hour_str)
+    #         rect = patches.Rectangle((idx - 0.4, 0), 0.8, max(values) * 1.1, 
+    #                                  linewidth=2, edgecolor='black', facecolor='#000000', alpha=0.1, zorder=4)
+    #         ax.add_patch(rect)
 
 def create_dashboard(today_prices, tomorrow_prices, thresholds):
     # Figure size for 800x480 at 100 DPI
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 4.8), dpi=100, facecolor=COLORS['bg'])
     
-    plt.subplots_adjust(hspace=0.4, left=0.08, right=0.98, top=0.92, bottom=0.12)
+    # Maximize chart area by reducing margins
+    # top=0.98, bottom=0.12, left=0.04, right=0.99 maximizes the plotting area
+    plt.subplots_adjust(hspace=0.35, left=0.04, right=0.99, top=0.97, bottom=0.12)
 
     render_axis(ax1, today_prices, "DZISIAJ (PLN/kWh)", thresholds, is_today=True)
     
@@ -114,14 +127,16 @@ def create_dashboard(today_prices, tomorrow_prices, thresholds):
         ax2.text(0.5, 0.5, "BRAK DANYCH NA JUTRO", color='gray', ha='center', va='center', transform=ax2.transAxes)
         ax2.axis('off')
 
-    # Last Updated (More visible footer)
-    plt.text(0.98, 0.03, f"Aktualizacja: {datetime.now().strftime('%Y-%m-%d %H:%M')}", 
-             color='#555555', fontsize=10, ha='right', va='bottom', transform=fig.transFigure, fontweight='bold')
+    # Last Updated (Absolute corner, no margin)
+    plt.text(0.998, 0.002, f"Aktualizacja: {datetime.now().strftime('%Y-%m-%d %H:%M')}", 
+             color='#555555', fontsize=8, ha='right', va='bottom', transform=fig.transFigure, fontweight='bold')
 
-    # Save high-quality JPG
-    plt.savefig("pstryk_dashboard.jpg", dpi=300, facecolor=COLORS['bg'], bbox_inches='tight')
+    # Save native 800x480px images
+    # Using dpi=100 with 8x4.8 inch figure gives exactly 800x480 pixels
+    plt.savefig("pstryk_dashboard.png", dpi=100, facecolor=COLORS['bg'])
+    plt.savefig("pstryk_dashboard.jpg", dpi=100, facecolor=COLORS['bg'], pil_kwargs={'quality': 95})
     plt.close()
-    print("Dashboard generated: pstryk_dashboard.jpg (High Quality)")
+    print("Dashboards generated: pstryk_dashboard.png & .jpg (800x480px)")
 
 def main():
     config = load_config()
