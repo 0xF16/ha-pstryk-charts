@@ -12,14 +12,12 @@ RUN apk add --no-cache \
     bash
 
 # Set up working directory
-WORKDIR /app
-
 # Copy files
-COPY pstryk_chart.py .
-COPY run.sh .
+COPY pstryk_chart.py /app/
+COPY run.sh /run.sh
 
 # Set permissions
-RUN chmod a+x run.sh
+RUN chmod a+x /run.sh
 
 # Entry point
-CMD [ "./run.sh" ]
+CMD [ "/run.sh" ]

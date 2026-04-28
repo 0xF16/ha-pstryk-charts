@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bashio
+#!/usr/bin/env bashio
 
 CONFIG_PATH=/data/options.json
 
@@ -13,7 +13,7 @@ echo "{\"HA_URL\": \"$HA_URL\", \"HA_TOKEN\": \"$HA_TOKEN\", \"CHEAP_THRESHOLD\"
 
 while true; do
     echo "Generating dashboard..."
-    python3 /app/pstryk_chart.py
+    cd /app && python3 /app/pstryk_chart.py
     
     # Publicly serve as JPG (accessible via http://ha-ip:8123/local/pstryk_charts/dashboard.jpg)
     mkdir -p /config/www/pstryk_charts
