@@ -1,5 +1,5 @@
 name: "Pstryk Energy Charts"
-version: "1.0.0"
+version: "1.1.0"
 slug: "pstryk_energy_charts"
 description: "Generates high-quality energy price charts (PDF/JPEG) for Home Assistant dashboard."
 url: "https://github.com/user/pstryk-charts"
@@ -12,19 +12,19 @@ arch:
 startup: application
 boot: auto
 options:
-  ha_url: "http://supervisor/core"
+  ha_url: "http://192.168.1.100:8123"
   ha_token: ""
   update_interval: 3600
   cheap_threshold: 0.4
   expensive_threshold: 1.2
-  refresh_minute: 5
+  refresh_minute: 2
 schema:
   ha_url: str
   ha_token: str?
-  update_interval: int
+  update_interval: int?
   cheap_threshold: float
   expensive_threshold: float
-  refresh_minute: int
+  refresh_minute: int?
 map:
   - config:rw
   - share:rw
