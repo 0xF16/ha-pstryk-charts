@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,11 +16,12 @@
             --current-hour-bg: rgba(255, 255, 255, 0.1);
         }
 
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
+            width: 800px;
+            height: 480px;
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -29,72 +31,77 @@
         .container {
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            padding: 5px;
+            width: 800px;
+            height: 480px;
+            padding: 8px;
             box-sizing: border-box;
-            gap: 5px;
+            gap: 8px;
         }
 
         .chart-container {
             flex: 1;
             background-color: var(--card-bg);
             border-radius: 8px;
-            padding: 5px 10px;
+            padding: 8px 12px;
             box-sizing: border-box;
             position: relative;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
+            min-height: 0;
+            /* Important for flex children */
         }
 
         .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .chart-title {
             margin: 0;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #fff;
         }
 
         .legend {
             display: flex;
-            gap: 15px;
-            font-size: 0.9rem;
+            gap: 12px;
+            font-size: 0.8rem;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
         .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
         }
 
         .chart-wrapper {
             flex: 1;
             position: relative;
             width: 100%;
+            min-height: 0;
+            /* Allow chart to shrink */
         }
 
         .hidden {
             display: none !important;
         }
-        
+
         .no-data {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #888;
         }
     </style>
@@ -102,29 +109,42 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0"></script>
     <script src="data.js"></script>
 </head>
+
 <body>
     <div class="container">
         <div class="chart-container" id="container-today">
             <div class="chart-header">
                 <h2 class="chart-title">Prices Today (PLN/kWh)</h2>
                 <div class="legend">
-                    <div class="legend-item"><div class="legend-color" style="background: var(--color-cheap)"></div>Cheap</div>
-                    <div class="legend-item"><div class="legend-color" style="background: var(--color-normal)"></div>Normal</div>
-                    <div class="legend-item"><div class="legend-color" style="background: var(--color-expensive)"></div>Expensive</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-cheap)"></div>Cheap
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-normal)"></div>Normal
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-expensive)"></div>Expensive
+                    </div>
                 </div>
             </div>
             <div class="chart-wrapper">
                 <canvas id="chart-today"></canvas>
             </div>
         </div>
-        
+
         <div class="chart-container" id="container-tomorrow">
             <div class="chart-header">
                 <h2 class="chart-title">Prices Tomorrow (PLN/kWh)</h2>
                 <div class="legend">
-                    <div class="legend-item"><div class="legend-color" style="background: var(--color-cheap)"></div>Cheap</div>
-                    <div class="legend-item"><div class="legend-color" style="background: var(--color-normal)"></div>Normal</div>
-                    <div class="legend-item"><div class="legend-color" style="background: var(--color-expensive)"></div>Expensive</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-cheap)"></div>Cheap
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-normal)"></div>Normal
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-expensive)"></div>Expensive
+                    </div>
                 </div>
             </div>
             <div class="chart-wrapper">
@@ -135,4 +155,5 @@
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>
