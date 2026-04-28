@@ -9,7 +9,8 @@ RUN apk add --no-cache \
     py3-numpy \
     py3-pillow \
     py3-requests \
-    bash
+    bash \
+    jq
 
 # Set up working directory
 # Copy files
@@ -20,4 +21,4 @@ COPY run.sh /run.sh
 RUN chmod a+x /run.sh
 
 # Entry point
-CMD [ "/run.sh" ]
+ENTRYPOINT [ "/run.sh" ]

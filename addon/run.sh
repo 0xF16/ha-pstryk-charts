@@ -1,12 +1,12 @@
-#!/usr/bin/env bashio
+#!/bin/bash
 
 CONFIG_PATH=/data/options.json
 
-HA_URL=$(bashio::config 'ha_url')
-HA_TOKEN=$(bashio::config 'ha_token')
-INTERVAL=$(bashio::config 'update_interval')
-CHEAP=$(bashio::config 'cheap_threshold')
-EXPENSIVE=$(bashio::config 'expensive_threshold')
+HA_URL=$(jq --raw-output '.ha_url' $CONFIG_PATH)
+HA_TOKEN=$(jq --raw-output '.ha_token' $CONFIG_PATH)
+INTERVAL=$(jq --raw-output '.update_interval' $CONFIG_PATH)
+CHEAP=$(jq --raw-output '.cheap_threshold' $CONFIG_PATH)
+EXPENSIVE=$(jq --raw-output '.expensive_threshold' $CONFIG_PATH)
 
 # Create a temporary config.json for the python script
 echo "{\"HA_URL\": \"$HA_URL\", \"HA_TOKEN\": \"$HA_TOKEN\", \"CHEAP_THRESHOLD\": $CHEAP, \"EXPENSIVE_THRESHOLD\": $EXPENSIVE}" > /app/config.json
