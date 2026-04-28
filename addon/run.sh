@@ -18,7 +18,6 @@ function generate_dashboard() {
     # Publicly serve as JPG
     mkdir -p /config/www/pstryk_charts
     cp /app/pstryk_dashboard.jpg /config/www/pstryk_charts/dashboard.jpg
-    cp /app/pstryk_dashboard.pdf /config/www/pstryk_charts/dashboard.pdf
     
     # Backup to share
     mkdir -p /share/pstryk_charts

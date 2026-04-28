@@ -118,11 +118,10 @@ def create_dashboard(today_prices, tomorrow_prices, thresholds):
     plt.text(0.98, 0.03, f"Aktualizacja: {datetime.now().strftime('%Y-%m-%d %H:%M')}", 
              color='#555555', fontsize=10, ha='right', va='bottom', transform=fig.transFigure, fontweight='bold')
 
-    # Save
-    plt.savefig("pstryk_dashboard.jpg", facecolor=COLORS['bg'])
-    plt.savefig("pstryk_dashboard.pdf", facecolor=COLORS['bg'])
+    # Save high-quality JPG
+    plt.savefig("pstryk_dashboard.jpg", dpi=300, facecolor=COLORS['bg'], bbox_inches='tight')
     plt.close()
-    print("Dashboard generated: pstryk_dashboard.jpg/pdf (800x480)")
+    print("Dashboard generated: pstryk_dashboard.jpg (High Quality)")
 
 def main():
     config = load_config()
