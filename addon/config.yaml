@@ -1,5 +1,5 @@
 name: "Pstryk Energy Charts"
-version: "1.1.0"
+version: "1.1.1"
 slug: "pstryk_energy_charts"
 description: "Generates high-quality energy price charts (PDF/JPEG) for Home Assistant dashboard."
 url: "https://github.com/user/pstryk-charts"
