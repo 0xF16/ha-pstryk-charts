@@ -1,7 +1,6 @@
-ARG BUILD_FROM
-FROM $BUILD_FROM
+ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:latest
+FROM ${BUILD_FROM}
 
-# Install python and dependencies
 # Install python and pre-compiled libraries
 RUN apk add --no-cache \
     python3 \
